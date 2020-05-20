@@ -13,11 +13,16 @@ import { fifaData } from './fifa.js';
 (e) Winner of 2014 world cup final */
 
 const finalWinners = fifaData.filter(function(item){
-    return item.Year === 2014;
+    return (item.Year === 2014 && item.Stage === 'Final');
+    
 });
+console.log(finalWinners)
+console.log(finalWinners[0]["Home Team Name"]);
+console.log(finalWinners[0]["Away Team Name"]);
+console.log(finalWinners[0]["Home Team Goals"]);
+console.log(finalWinners[0]["Away Team Goals"])
+console.log(finalWinners[0]["Win conditions"])
 
-// console.log(finalWinners);
-// console.log(finalWinners[56]["Home Team Name"]);
 
 /* Task 2: Create a function called  getFinals that takes `data` as an argument and returns an array of objects with only finals data */
 
@@ -28,27 +33,35 @@ function getFinals(data) {
     return finalsData
 };
 
-console.log(getFinals(fifaData))
+// console.log(getFinals(fifaData))
 
 /* Task 3: Implement a higher-order function called `getYears` that accepts the callback function `getFinals`, and returns an array called `years` containing all of the years in the dataset */
 
 function getYears(callback) {
     let data = callback(fifaData);
     const years = data.map(function(item){
-        return {'Year': item.Year};
+        return item.Year;
     })
     return years;
 };
 
-// console.log(getYears(getFinals));
+console.log(getYears(getFinals));   
 
 /* Task 5: Implement a higher-order function called `getWinners`, that accepts the callback function `getFinals()` and determine the winner (home or away) of each `finals` game. Return the name of all winning countries in an array called `winners` */ 
 
 function getWinners(callback) {
-    
-
+    let data = callback(fifaData);
+    let winners = data.map(function(item){
+        if (item["Home Team Goals"] > item["Away Team Goals"]){
+            return item["Home Team Name"];  
+        } else if (item["Away Team Goals"] > item["Home Team Goals"]){
+            return item["Away Team Name"];
+        } else {
+            return  `Tie`;
+        }
+    });   
+    return winners;
 };
-
 console.log(getWinners(getFinals));
 
 /* Task 6: Implement a higher-order function called `getWinnersByYear` that accepts the following parameters and returns a set of strings "In {year}, {country} won the world cup!" 
@@ -58,22 +71,37 @@ Parameters:
  * callback function getYears
  */
 
-function getWinnersByYear(/* code here */) {
-
+function getWinnersByYear(callback1, callback2) {
+    let years = callback1(getFinals);
+    let winners = callback2(getFinals);
+    return years.map(function(year, index){
+        return `In ${year}, ${winners[index]} won the world cup!`;
+    
+    });
+    // winners.map(function){
+    //     return  `${data1.winners} won the world cup!`
+    // }
 };
 
-getWinnersByYear();
+console.log(getWinnersByYear(getYears, getWinners));
 
-/* Task 7: Write a function called `getAverageGoals` that accepts a parameter `data` and returns the the average number of home team goals and away team goals scored per match (Hint: use .reduce and do this in 2 steps) */
+// getWinner    sByYear();
 
-function getAverageGoals(data) {
-    // const averageGoals = data.reduce((total, goals){
-    //     return total 
-    // }, 0)
+/* Task 7: Write a function called `getAverageGoals` that accepts a parameter `data` and returns the average number of home team goals and away team goals scored per match (Hint: use .reduce and do this in 2 steps) */
 
-};
+    function getAverageGoals(data) {
+        let homeGoals = data.reduce(function(total, currentValue) {
+            return total + currentValue["Home Team Goals"]
+        }, 0);
+        let homeAverageScore = homeGoals / data.length;
+        let awayGoals = data.reduce(function(total, currentValue) {
+            return total + currentValue["Away Team Goals"];
+        }, 0)
+        let awayAverageScore = awayGoals / data.length;
+        return `Home Average: ${homeAverageScore}, Away Average: ${awayAverageScore}` 
+    };
 
-getAverageGoals();
+console.log(getAverageGoals(fifaData));
 
 /// STRETCH 🥅 //
 
